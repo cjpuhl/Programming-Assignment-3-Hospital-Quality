@@ -15,49 +15,24 @@ best <- function(state, decease) {
                 stop("invalid outcome")
         }
         
-        else{
-                ##selects only the hospitals in the given state
-                outcome <- outcome[outcome$State == state,]
-                
-                ##selects only useful columns
-                outcome <- outcome[, c(2, 7, 11, 17, 23)]
-                names(outcome) <- c("Hospital", "State", "heart attack", 
-                                    "heart failure", "pneumonia")
-        }
+        ##selects only the hospitals in the given state
+        outcome <- outcome[outcome$State == state,]
         
-        if (decease == "heart attack"){
-                
-                ##converts column to numeric
-                outcome[, "heart attack"] <- as.numeric(outcome[, "heart attack"])
-                
-                ##orders data by decease column and hospital name
-                outcome <- outcome[order(outcome$`heart attack`, 
-                                         outcome$Hospital),]
-        }
+        ##selects only useful columns
+        outcome <- outcome[, c(2, 7, 11, 17, 23)]
+        names(outcome) <- c("Hospital", "State", "heart attack", 
+                            "heart failure", "pneumonia")
         
-        else if(decease == "heart failure"){
-                
-                ##converts column to numeric
-                outcome[, "heart failure"] <- as.numeric(outcome[, "heart failure"])
-                
-                ##orders data by decease column and hospital name
-                outcome <- outcome[order(outcome$`heart failure`, 
-                                         outcome$Hospital),]
-        }
+        ##select only necessary decease and converting values to numeric
+        outcome <- outcome[, c("Hospital", "State", decease)]
+        outcome[, decease] <- as.numeric(outcome[, decease])
         
-        else if(decease == "pneumonia"){
-                ##converts column to numeric
-                outcome[, "pneumonia"] <- as.numeric(outcome[, "pneumonia"])
-                
-                ##orders data by decease column and hospital name
-                outcome <- outcome[order(outcome$pneumonia, 
-                                         outcome$Hospital),]
-        }
+        ##removing NAs
+        outcomenoNA <- complete.cases(outcome)
+        outcome <- outcome[outcomenoNA, ]
         
-        print(paste("Best Hospital for", decease, "in", 
-                    state, "is", outcome[1,1]))
-        outcome
+        ##sorts data by death rate
+        outcome <- outcome[order(outcome[, 3], outcome$Hospital), ]
+        outcome[1,1]
 }
-
-outcome <- best("NY", "hert attack")
 
